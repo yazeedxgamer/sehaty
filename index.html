@@ -344,7 +344,7 @@
         }
         
         /* ============================================
-           ||   7. كود التجاوب مع الجوال (الجديد)     ||
+           || 7. كود التجاوب مع الجوال (تم إصلاحه)    ||
            ============================================
         */
         @media screen and (max-width: 768px) {
@@ -366,107 +366,98 @@
                 margin: 20px auto;
             }
             #search-section {
-                padding: 25px;
+                padding: 25px 20px; /* تقليل الحشو الجانبي */
             }
             #search-section h2 {
-                font-size: 24px;
+                font-size: 22px; /* تصغير الخط قليلاً */
             }
 
-            /* تعديل هيدر التقرير في الجوال */
+            /* إصلاح هيدر التقرير في الجوال */
             .report-pdf-header {
                 padding: 15px;
-                flex-direction: column; /* جعل الشعارات فوق بعضها */
-                align-items: center;
-                gap: 15px;
+                flex-direction: row; /* إبقاء العناصر جنباً إلى جنب */
+                align-items: flex-start;
             }
             .report-pdf-header .logo-ar,
             .report-pdf-header .logo-en {
-                text-align: center;
+                width: 50%; /* كل جهة تأخذ نصف العرض */
+            }
+            .report-pdf-header .logo-ar {
+                text-align: right;
             }
             .report-pdf-header .logo-en {
-                text-align: center;
-                direction: ltr;
+                text-align: left;
             }
             .report-pdf-header .logo-ar img.seha-logo,
             .report-pdf-header .logo-en img {
-                width: 80px;
+                width: 70px; /* تصغير الشعارات */
             }
             .report-pdf-header .logo-ar img.ksa-text {
-                width: 130px;
+                width: 110px; /* تصغير خط المملكة */
+            }
+            .report-pdf-header .logo-en p {
+                font-size: 14px; /* تصغير الخط الإنجليزي */
             }
             
             /* تعديل عنوان التقرير */
             .report-pdf-title {
                 font-size: 18px;
-                padding: 10px;
+                padding: 12px 10px;
+                line-height: 1.4; /* لضمان عدم تداخل الأسطر */
             }
 
-            /* * أهم جزء: جعل الجدول متجاوب
-             * سنقوم بتحويل الجدول إلى كتل (blocks)
-             */
+            /* *** إصلاح الجدول (النقطة الأهم) *** */
             .report-table-wrapper {
                 padding: 0;
             }
-            .report-table, .report-table tbody, .report-table tr {
+            .report-table, .report-table tbody {
                 display: block;
                 width: 100%;
             }
             
             .report-table tr {
-                border: 1px solid var(--table-border);
-                margin-bottom: 10px;
+                display: block;
+                border: 1px solid var(--border-color);
                 border-radius: 8px;
-                overflow: hidden;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+                margin-bottom: 10px;
+                overflow: hidden; /* لإخفاء زوائد الخلايا */
+                background: #fff;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.05);
             }
 
+            /* إخفاء كل خلايا الجدول افتراضياً */
             .report-table td {
-                display: grid;
-                grid-template-columns: 1fr 1fr; /* عمودين (للاسم والقيمة) */
-                padding: 12px 15px;
-                border: none; /* إزالة حدود الخلايا الداخلية */
-                text-align: right !important; /* فرض الاتجاه لليمين */
-                width: 100% !important; /* جعل الخلية تملأ السطر */
-                box-sizing: border-box;
-                border-bottom: 1px solid #eee;
-            }
-            .report-table tr:last-child td:last-child {
-                border-bottom: none;
-            }
-            
-            /* إخفاء العناوين الإنجليزية في الجوال (لتبسيط العرض) */
-            .report-table .en-label,
-            .report-table .value-en {
                 display: none;
-            }
-
-            /* إظهار العناوين العربية والقيم فقط */
-            .report-table .ar-label {
-                grid-column: 2 / 3; /* الاسم على اليمين */
-                color: var(--text-color);
-                font-weight: 600;
-            }
-            .report-table .value-ar {
-                grid-column: 1 / 2; /* القيمة على اليسار */
-                text-align: left !important;
-                direction: ltr; /* لضمان الأرقام والنصوص الإنجليزية */
+                border: none;
+                padding: 0;
+                width: auto !important;
+                text-align: right !important;
             }
             
-            /* تنسيق خاص للخلايا الفارغة */
-            .value-empty {
-                background-color: transparent;
+            /* إظهار وتنسيق الخلية الخاصة بالعنوان العربي (ar-label) */
+            .report-table td.ar-label {
+                display: block;
+                font-size: 14px;
+                color: #555;
+                font-weight: 600;
+                padding: 12px 15px 2px 15px; /* حشو علوي وسفلي معدل */
             }
-            /* إخفاء الخلايا الفارغة تماماً في الجوال */
+            
+            /* إظهار وتنسيق الخلية الخاصة بالقيمة العربية (value-ar) */
+            .report-table td.value-ar {
+                display: block;
+                font-size: 17px;
+                font-weight: 700;
+                color: var(--text-color);
+                padding: 0px 15px 12px 15px; /* حشو علوي وسفلي معدل */
+                direction: ltr; /* لضمان عرض الأرقام والرموز الإنجليزية (مثل PSL) بشكل صحيح */
+            }
+            
+            /* إخفاء الخلايا الفارغة تماماً (مثل خانة جهة العمل) */
             .report-table td.value-empty {
                 display: none;
             }
-            
-            /* تنسيق خاص لاسم المريض والطبيب */
-            .report-table .value-ar#res-name-ar,
-            .report-table .value-ar#res-practitioner-ar {
-                font-size: 14px;
-            }
-            
+
             /* تعديل قسم الختم والفوتر للجوال */
             .report-pdf-stamp {
                 padding: 20px 15px;
@@ -479,6 +470,10 @@
             }
             .report-pdf-footer {
                 padding: 20px 15px;
+            }
+            .report-pdf-footer .url {
+                font-size: 13px; /* تصغير الرابط قليلاً */
+                word-break: break-all; /* لكسر الرابط الطويل */
             }
             .report-pdf-footer .clinic-info {
                 flex-direction: column;
@@ -495,10 +490,9 @@
                 width: 100%; /* جعل الأزرار بعرض الشاشة */
                 justify-content: center;
                 padding: 12px;
-                font-size: 18px;
+                font-size: 17px;
             }
         }
-
     </style>
 </head>
 <body>
@@ -602,8 +596,7 @@
                             </tr>
                             <tr>
                                 <td class="ar-label">جهة العمل</td>
-                                <td class="value-ar value-empty"></td>
-                                <td class="value-en value-empty"></td>
+                                <td class="value-ar value-empty">---</td> <td class="value-en value-empty">---</td>
                                 <td class="en-label">Employer</td>
                             </tr>
                             <tr>
@@ -690,9 +683,8 @@
                 if (nationalId === '11298347311' && leaveId === 'PSL210509324823') {
                     
                     // في حالة النجاح:
-                    // نملأ بيانات التقرير بالبيانات المطلوبة
+                    // نملأ بيانات التقرير (الكود الخاص بك سليم)
                     
-                    // === هذا هو الكود الذي أضفته أنت (وهو الآن صحيح) ===
                     document.getElementById('res-leave-id-en').textContent = 'PSL210509324823';
                     document.getElementById('res-leave-id-ar').textContent = 'PSL210509324823';
                     
@@ -722,8 +714,6 @@
 
                     document.getElementById('res-position-en').textContent = 'General';
                     document.getElementById('res-position-ar').textContent = 'طبيب عام';
-                    // === نهاية الكود الذي أضفته ===
-
 
                     // إخفاء الفورم وإظهار التقرير
                     searchSection.style.display = 'none';
