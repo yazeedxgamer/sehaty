@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <title>صحة - التحقق من الإجازات المرضية</title>
+
+    <style>
+        :root {
+            --primary-color: #306DB5; 
+            --primary-light: #f4f7fb;
+            --success-color: #0a875a;
+            --error-color: #d93025;
+            --text-color: #333;
+            --border-color: #e0e0e0;
+            --table-border: #ddd;
+            --table-header-bg: #f9f9f9;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            direction: rtl;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* 1. تصميم الهيدر (الشعار) */
+        .header {
+            background-color: #fff;
+            padding: 15px 40px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header .logo {
+            height: 35px;
+        }
+
+        .header .login-btn {
+            background-color: var(--primary-color);
+            color: #fff;
+            text-decoration: none;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        /* 2. تصميم المحتوى الرئيسي */
+        main {
+            flex: 1;
+            max-width: 900px; /* عرض أكبر للتقرير */
+            width: 90%;
+            margin: 40px auto;
+        }
+
+        /* 3. تصميم قسم البحث (الفورم) */
+        #search-section {
+            background-color: #fff;
+            padding: 35px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            border-top: 5px solid var(--primary-color);
+        }
+
+        #search-section h2 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 25px;
+            font-weight: 700;
+        }
+
+        form label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: block;
+            color: var(--text-color);
+            font-size: 16px;
+        }
+
+        form input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-sizing: border-box;
+            margin-bottom: 20px;
+            font-family: 'Cairo', sans-serif;
+            font-size: 16px;
+        }
+
+        form input[type="text"]:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 5px rgba(48, 109, 181, 0.3);
+            outline: none;
+        }
+
+        form button {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--primary-color);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        form button:hover {
+            background-color: #1f508f;
+        }
+        
+        #error-message {
+            color: var(--error-color);
+            text-align: center;
+            margin-top: 15px;
+            font-weight: 600;
+            display: none;
+        }
+
+        /* 4. تصميم قسم التقرير (الجديد) */
+        #report-section {
+            display: none; /* مخفي افتراضياً */
+        }
+        
+        /* هذا هو الوعاء الذي يحمل شكل الـ PDF */
+        .report-container {
+            background-color: #fff;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden; /* لإخفاء أي زوائد */
+        }
+        
+        /* هيدر التقرير (شعارات) */
+        .report-pdf-header {
+            padding: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 2px solid #000;
+        }
+        .report-pdf-header .logo-ar {
+            text-align: right;
+        }
+        .report-pdf-header .logo-ar h1 {
+            color: var(--primary-color);
+            margin: 0;
+            font-size: 30px;
+        }
+        .report-pdf-header .logo-ar p {
+            margin: 0;
+            font-weight: 600;
+        }
+        .report-pdf-header .logo-en {
+            text-align: left;
+            font-weight: 600;
+        }
+
+        /* عنوان التقرير (إجازة مرضية) */
+        .report-pdf-title {
+            text-align: center;
+            font-size: 22px;
+            font-weight: 700;
+            background: var(--table-header-bg);
+            padding: 15px;
+            border-bottom: 1px solid var(--table-border);
+        }
+
+        /* جسم التقرير (الجدول) */
+        .report-table-wrapper {
+            padding: 20px;
+        }
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .report-table td {
+            border: 1px solid var(--table-border);
+            padding: 12px;
+            vertical-align: middle;
+            font-size: 15px;
+        }
+        /* العمود الأيمن (عربي) */
+        .report-table .ar-label {
+            text-align: right;
+            font-weight: 700;
+            color: var(--primary-color);
+            width: 30%;
+        }
+        /* العمود الأيسر (انجليزي) */
+        .report-table .en-label {
+            text-align: left;
+            width: 30%;
+            font-size: 14px;
+            color: #444;
+        }
+        /* العمود الأوسط (البيانات) */
+        .report-table .value {
+            text-align: right;
+            font-weight: 600;
+            color: var(--text-color);
+            width: 40%;
+            direction: ltr; /* لضمان عرض الأرقام الانجليزية بشكل صحيح */
+            text-align: center;
+        }
+        /* تنسيق خاص للبيانات المتعددة الأسطر */
+        .report-table .value.multiline {
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* فوتر التقرير (معلومات التحقق) */
+        .report-pdf-footer {
+            padding: 20px;
+            background: var(--table-header-bg);
+            border-top: 1px solid var(--table-border);
+            text-align: center;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+        .report-pdf-footer p {
+            margin: 5px 0;
+            font-weight: 600;
+        }
+        .report-pdf-footer .url {
+            color: var(--primary-color);
+            direction: ltr;
+            font-weight: 700;
+        }
+        .report-pdf-footer .clinic-info {
+            margin-top: 20px;
+            border-top: 1px dashed var(--table-border);
+            padding-top: 20px;
+            font-weight: 700;
+            color: #555;
+        }
+
+        /* 5. تصميم أزرار التحكم (خارج التقرير) */
+        .report-actions {
+            padding: 20px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .action-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Cairo', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        #back-btn {
+            background-color: #fff;
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+        }
+        #back-btn:hover {
+            background-color: var(--primary-light);
+        }
+        
+        #pdf-btn {
+            background-color: var(--primary-color);
+            color: #fff;
+        }
+        #pdf-btn:hover {
+            background-color: #1f508f;
+        }
+        
+        /* ============================================
+         ||       6. تنسيق الطباعة (PDF)           ||
+         ============================================
+        */
+        @media print {
+            body {
+                background-color: #fff;
+                margin: 0;
+                padding: 0;
+            }
+            /* إخفاء كل شيء ما عدا حاوية التقرير */
+            .header, .footer, #search-section, .report-actions {
+                display: none !important;
+            }
+            main {
+                width: 100%;
+                max-width: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            #report-section {
+                display: block !important;
+            }
+            /* إزالة الظلال والحدود من التقرير ليصبح صفحة كاملة */
+            .report-container {
+                border: none;
+                box-shadow: none;
+                border-radius: 0;
+            }
+            /* ضمان طباعة ألوان الخلفية */
+            .report-pdf-title {
+                -webkit-print-color-adjust: exact; 
+                print-color-adjust: exact;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <img src="https://seha.sa/assets/seha_logo-m9JsokyV.svg" alt="شعار منصة صحة" class="logo">
+        <a href="#" class="login-btn">تسجيل الدخول</a>
+    </header>
+
+    <main>
+        
+        <section id="search-section">
+            <h2>التحقق من الإجازة المرضية</h2>
+            <form id="sickLeaveForm">
+                <div>
+                    <label for="nationalId">رقم الهوية</label>
+                    <input type="text" id="nationalId" placeholder="ادخل رقم الهوية (10 أرقام)">
+                </div>
+                <div>
+                    <label for="leaveId">رقم الإجازة المرضية</label>
+                    <input type="text" id="leaveId" placeholder="ادخل رقم الإجازة (PSL...)">
+                </div>
+                <p id="error-message">
+                    عذراً، البيانات المدخلة غير صحيحة. يرجى التأكد والمحاولة مرة أخرى.
+                </p>
+                <button type="submit">
+                    <i class="fas fa-search"></i> بحــث
+                </button>
+            </form>
+        </section>
+
+        <section id="report-section">
+            
+            <div class="report-container">
+                
+                <div class="report-pdf-header">
+                    <div class="logo-ar">
+                        <h1>صحة</h1>
+                        <p>السعودية</p>
+                    </div>
+                    <div class="logo-en">
+                        <p>Seha</p>
+                        <p>Kingdom of Saudi Arabia</p>
+                    </div>
+                </div>
+                
+                <div class="report-pdf-title">
+                    تقرير إجازة مرضية / Sick Leave Report
+                </div>
+
+                <div class="report-table-wrapper">
+                    <table class="report-table">
+                        <tbody>
+                            <tr>
+                                <td class="ar-label">رمز الإجازة</td>
+                                <td class="value" id="res-leave-id"></td>
+                                <td class="en-label">Leave ID</td>
+                            </tr>
+                            <tr>
+                                <td class="ar-label">مدة الإجازة</td>
+                                <td class="value multiline" id="res-duration"></td>
+                                <td class="en-label">Leave Duration</td>
+                            </tr>
+                            <tr>
+                                <td class="ar-label">تاريخ الدخول</td>
+                                <td class="value" id="res-admission"></td>
+                                <td class="en-label">Admission Date</td>
+                            </tr>
+                            <tr>
+                                <td class="ar-label">تاريخ الخروج</td>
+                                <td class="value" id="res-discharge"></td>
+                                <td class="en-label">Discharge Date</td>
+                            </tr>
+                            <tr>
+                                <td class="ar-label">تاريخ إصدار التقرير</td>
+                                <td class="value" id="res-issue"></td>
+                                <td class="en-label">Issue Date</td>
+                            </tr>
+                            <tr>
+                                <td class="ar-label">الاسم</td>
+                                <td class="value" id="res-name"></td>
+                                <td class="en-label">Name</td>
+                            </tr>
+                            <tr>
+                                <td class="ar-label">رقم الهوية / الإقامة</td>
+                                <td class="value" id="res-national-id"></td>
+                                <td class="en-label">National ID/Iqama</td>
+                            </tr>
+                            <tr>
+                                <td class="ar-label">الجنسية</td>
+                                <td class="value" id="res-nationality"></td>
+                                <td class="en-label">Nationality</td>
+                            </tr>
+                            <tr>
+                                <td class="ar-label">جهة العمل</td>
+                                <td class="value" id="res-employer"></td>
+                                <td class="en-label">Employer</td>
+                            </tr>
+                            <tr>
+                                <td class="ar-label">اسم الممارس</td>
+                                <td class="value" id="res-practitioner"></td>
+                                <td class="en-label">Practitioner Name</td>
+                            </tr>
+                            <tr>
+                                <td class="ar-label">المسمى الوظيفي</td>
+                                <td class="value" id="res-position"></td>
+                                <td class="en-label">Position</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="report-pdf-footer">
+                    <p>للتحقق من بيانات التقرير يرجى التأكد من زيارة موقع منصة صحة الرسمي</p>
+                    <p class="url">www.seha.sa/#/inquiries/slenquiry</p>
+                    <p>To check the report please visit Seha's offical website</p>
+                    
+                    <div class="clinic-info">
+                        مجمع محمد علي الحبيب الطبي
+                        <br>
+                        MOHAMED ALI ALHABEEB POLYCLINIC
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="report-actions">
+                <button id="back-btn" class="action-btn">
+                    <i class="fas fa-arrow-right"></i> رجوع للبحث
+                </button>
+                <button id="pdf-btn" class="action-btn">
+                    <i class="fas fa-download"></i> تحميل التقرير (PDF)
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="footer">
+        منصة صحة معتمدة من قبل وزارة الصحة © 2025
+    </footer>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // 1. الوصول لجميع العناصر
+            const searchSection = document.getElementById('search-section');
+            const reportSection = document.getElementById('report-section');
+            const form = document.getElementById('sickLeaveForm');
+            const errorMessage = document.getElementById('error-message');
+            
+            const nationalIdInput = document.getElementById('nationalId');
+            const leaveIdInput = document.getElementById('leaveId');
+
+            const backBtn = document.getElementById('back-btn');
+            const pdfBtn = document.getElementById('pdf-btn');
+
+            // 2. عند الضغط على زر "بحث"
+            form.addEventListener('submit', function(event) {
+                event.preventDefault(); 
+
+                const nationalId = nationalIdInput.value;
+                const leaveId = leaveIdInput.value;
+
+                // --- التحقق من البيانات المطلوبة منك ---
+                if (nationalId === '11298347311' && leaveId === 'PSL210509324823') {
+                    
+                    // في حالة النجاح:
+                    // نملأ بيانات التقرير بالبيانات المطلوبة
+                    document.getElementById('res-leave-id').textContent = 'PSL210509324823';
+                    document.getElementById('res-duration').innerHTML = '1 يوم <br> (16-11-2025 إلى 16-11-2025)';
+                    document.getElementById('res-admission').textContent = '16-11-2025';
+                    document.getElementById('res-discharge').textContent = '16-11-2025';
+                    document.getElementById('res-issue').textContent = '16-11-2025';
+                    
+                    // بياناتك الأساسية
+                    document.getElementById('res-name').textContent = 'فهد محمد علي العتيبي'; // (استخدمت الاسم من الـ PDF كبيانات وهمية)
+                    document.getElementById('res-national-id').textContent = '11298347311';
+                    document.getElementById('res-nationality').textContent = 'السعودية'; // (بيانات وهمية)
+                    document.getElementById('res-employer').textContent = '---'; // (جهة العمل)
+                    document.getElementById('res-practitioner').textContent = 'عبدالله محمد العنزي';
+                    document.getElementById('res-position').textContent = 'طبيب عام'; // (بيانات وهمية)
+
+
+                    // إخفاء الفورم وإظهار التقرير
+                    searchSection.style.display = 'none';
+                    reportSection.style.display = 'block';
+                    errorMessage.style.display = 'none';
+
+                } else {
+                    // في حالة الفشل:
+                    errorMessage.style.display = 'block';
+                    reportSection.style.display = 'none';
+                }
+            });
+
+            // 3. عند الضغط على زر "رجوع للبحث"
+            backBtn.addEventListener('click', function() {
+                reportSection.style.display = 'none';
+                searchSection.style.display = 'block';
+                nationalIdInput.value = '';
+                leaveIdInput.value = '';
+            });
+
+            // 4. عند الضغط على زر "تحميل التقرير"
+            pdfBtn.addEventListener('click', function() {
+                window.print();
+            });
+
+        });
+    </script>
+
+</body>
+</html>
